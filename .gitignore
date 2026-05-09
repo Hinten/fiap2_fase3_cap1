@@ -1,0 +1,24 @@
+# Credenciais — NUNCA commitar
+firmware/include/secrets.h
+scripts/.env
+scripts/.env.local
+*.pem
+
+# PlatformIO
+.pio/
+.vscode/
+firmware/.pio/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.python-version
+
+# Node-RED (export local)
+.node-red/
+
+# OS
+.DS_Store
+Thumbs.db
