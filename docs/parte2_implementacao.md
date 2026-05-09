@@ -80,7 +80,7 @@ antes de testar end-to-end.
 | **Envio MQTT + broker**              | **2**  | `cloud_link.cpp` (TLS, LWT, QoS 1) + relatório §2 |
 | **Dashboard funcional + alertas**    | **2**  | `flows.json` (chart + gauge + alerta) + relatório §3 |
 | **Documentação**                     | **2**  | `docs/parte2_relatorio.md` + `README.md` + READMEs por pasta |
-| Bônus — Grafana                      | extra  | Nó InfluxDB no flow + relatório §4 |
+| Bônus — Grafana                      | extra  | ✅ implementado: nó InfluxDB no flow + dashboard público em [hinten.grafana.net/public-dashboards/1fc63ea0bb144546ac549fc34fb3b542](https://hinten.grafana.net/public-dashboards/1fc63ea0bb144546ac549fc34fb3b542) + screenshot em `assets/grafana_dashboard.png` + relatório §4 |
 
 ## Próximos passos manuais (você)
 
@@ -90,7 +90,7 @@ antes de testar end-to-end.
 4. [ ] Subir projeto Wokwi: ESP32 + DHT22 (GPIO 4) + botão (GPIO 5). Colar conteúdo de `firmware/`. Anotar link no README raiz.
 5. [ ] `npm install -g node-red`, rodar `node-red`, instalar `node-red-dashboard`, importar `flows.json`, configurar nó HiveMQ, deploy.
 6. [ ] Smoke test: `python scripts\mock_publisher.py --scenario tudo --duration 60` com dashboard aberto. Capturar prints (E2E-A, E2E-B).
-7. [ ] (Bônus) Criar InfluxDB Cloud + Grafana Cloud, habilitar nó `InfluxDB` no flow, importar dashboard.
+7. [x] (Bônus) Criar InfluxDB Cloud + Grafana Cloud, habilitar nó `InfluxDB` no flow, importar dashboard. ✅ — dashboard público: https://hinten.grafana.net/public-dashboards/1fc63ea0bb144546ac549fc34fb3b542
 8. [ ] Combinar com a pessoa da Parte 1: passar `cloud_link.h` + schema JSON + exemplo de uso do README.
 
 ## Como testar (resumo)

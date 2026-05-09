@@ -66,7 +66,13 @@ indicador de alerta. O editor só mostra o fluxo e o painel de debug.
 
 Detalhes em [`node-red/README.md`](node-red/README.md).
 
-### 4. Wokwi
+### 4. (Opcional) Grafana Cloud
+
+Bônus do enunciado. Caminho: Node-RED → InfluxDB Cloud (free) → Grafana
+Cloud (free). Guia completo em [`docs/grafana_setup.md`](docs/grafana_setup.md)
+(~30 min na primeira vez).
+
+### 5. Wokwi
 
 Subir um projeto Wokwi com ESP32 + DHT22 (GPIO 4) + botão (GPIO 5,
 INPUT_PULLUP) e colar o conteúdo de `firmware/`. Rodar — o serial
@@ -157,14 +163,16 @@ publisher Python e ao inject node embutido no Node-RED.
 - [ ] **Envio MQTT (2 pt)** — T1, T2, T3.
 - [ ] **Dashboard + alertas (2 pt)** — T6, T7, T8, T9.
 - [ ] **Documentação (2 pt)** — `docs/parte2_relatorio.md` + prints + READMEs.
-- [ ] **Bônus Grafana** — T11, T12.
+- [ ] **Bônus Grafana** — T11, T12. Guia passo-a-passo em [`docs/grafana_setup.md`](docs/grafana_setup.md).
 - [ ] **Integração com Parte 1** — `cloud_link.h` finalizado, T13 passando.
 
 ## Links externos
 
 - **Wokwi:** *(adicionar link após subir o projeto)*
 - **HiveMQ Cloud Web Client:** https://console.hivemq.cloud/
-- **Grafana Cloud público (opcional):** *(adicionar link do dashboard se houver)*
+- **Grafana Cloud público:** https://hinten.grafana.net/public-dashboards/1fc63ea0bb144546ac549fc34fb3b542
+
+![Dashboard Grafana — CardioIA](assets/grafana_dashboard.png)
 
 ## Decisões e escopo
 

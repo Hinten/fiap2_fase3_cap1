@@ -52,7 +52,7 @@ Pelo editor, em **Manage palette → Install**, adicione:
 | `extract temp` → `Temperatura` | Extrai `payload.temp` e mostra no gauge (zona vermelha > 38°C).|
 | `regra de alerta` → `Status` | Função JS aplica thresholds (BPM > 120, Temp > 38) e pinta verde/vermelho. |
 | `MOCK alerta` (desabilitado) | Inject node que dispara um payload de alerta SEM precisar do MQTT. Habilitar para smoke test rápido do dashboard. |
-| `InfluxDB Cloud` (desabilitado) | Escreve `vitals` no bucket. Habilitar e configurar URL/token para enviar dados ao Grafana Cloud. |
+| `InfluxDB Cloud` (desabilitado) | Escreve `vitals` no bucket. Habilitar e configurar URL/token para enviar dados ao Grafana Cloud. **Guia passo-a-passo:** [`docs/grafana_setup.md`](../docs/grafana_setup.md). |
 
 ## Ajustar limites
 

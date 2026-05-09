@@ -159,31 +159,59 @@ O flow inclui dois recursos para validação rápida:
 
 ## 4. Bônus — Grafana Cloud
 
-A integração com Grafana Cloud foi feita pelo caminho mais direto e
-gratuito: **Node-RED escreve em InfluxDB Cloud (free) → Grafana Cloud
-consome InfluxDB como datasource**.
+A integração com Grafana Cloud foi **implementada** pelo caminho mais
+direto e gratuito: **Node-RED escreve em InfluxDB Cloud (free) → Grafana
+Cloud consome InfluxDB como datasource**.
 
 | Por que não usar o plugin MQTT direto do Grafana? | É **pago** (marketplace partner). O caminho via InfluxDB usa apenas free tiers. |
 
-No flow, o nó `InfluxDB Cloud (opcional)` está desabilitado por padrão.
-Para ativar:
+### 4.1 Pipeline implementado
 
-1. Criar conta em InfluxDB Cloud Serverless, criar bucket `cardioia` e
-   gerar token de escrita.
-2. Editar o nó `influxdb` no Node-RED — preencher URL, organização,
-   bucket e token; habilitar o nó.
-3. Em Grafana Cloud, adicionar InfluxDB como datasource (mesma URL,
-   bucket, token). Criar um painel time-series com a query:
+```
+ESP32/Mock ──MQTT/TLS──▶ HiveMQ ──▶ Node-RED ──┐
+                                                ├─▶ Dashboard Node-RED (já mostrado em §3)
+                                                │
+                                                └─▶ InfluxDB Cloud (bucket "cardioia",
+                                                       measurement "vitals", fields:
+                                                       temp, hum, bpm) ──▶ Grafana Cloud
+```
 
-   ```flux
-   from(bucket: "cardioia")
-     |> range(start: -1h)
-     |> filter(fn: (r) => r._measurement == "vitals")
-     |> filter(fn: (r) => r._field == "bpm" or r._field == "temp")
-   ```
+No `flows.json` o nó `InfluxDB Cloud (opcional)` ficou habilitado depois
+de configurado com URL do cluster, organização, bucket `cardioia` e
+token de escrita. A query Flux usada nos painéis é:
 
-A latência típica entre publicação no broker e ponto visível no
-Grafana é de < 10 segundos.
+```flux
+from(bucket: "cardioia")
+  |> range(start: -1h)
+  |> filter(fn: (r) => r._measurement == "vitals")
+  |> filter(fn: (r) => r._field == "bpm" or r._field == "temp")
+```
+
+### 4.2 Resultado
+
+O dashboard público está disponível em
+**https://hinten.grafana.net/public-dashboards/1fc63ea0bb144546ac549fc34fb3b542**
+e exibe os mesmos dados que o painel Node-RED, com a vantagem de
+agregação e histórico nativos do Grafana.
+
+![Dashboard Grafana CardioIA](../assets/grafana_dashboard.png)
+
+A latência típica entre publicação no broker e ponto visível no Grafana
+é de **< 10 segundos** (limitada principalmente pelo flush do InfluxDB
+Cloud Serverless free tier).
+
+### 4.3 Limitação de embedding
+
+Grafana **Cloud** não permite habilitar `allow_embedding`, ou seja, não
+é possível incorporar o dashboard via `<iframe>` em sites externos. A
+alternativa adotada foi o **public dashboard** (URL acima) — qualquer
+pessoa com o link abre direto, sem login.
+
+### 4.4 Documentação de setup
+
+O passo-a-passo completo (criar conta InfluxDB, gerar token, configurar
+Node-RED, criar conta Grafana, adicionar datasource, montar painéis,
+tornar dashboard público) está em [`grafana_setup.md`](grafana_setup.md).
 
 ---
 
