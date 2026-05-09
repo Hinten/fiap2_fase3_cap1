@@ -55,10 +55,14 @@ npm install -g --unsafe-perm node-red
 node-red
 ```
 
-Acessar editor em http://127.0.0.1:1880, instalar `node-red-dashboard`
+Acessar **editor** em http://127.0.0.1:1880, instalar `node-red-dashboard`
 em **Manage palette → Install** e importar `node-red/flows.json`.
 Editar o nó `HiveMQ Cloud` com seu host/credenciais e fazer Deploy.
-Dashboard fica em http://127.0.0.1:1880/ui.
+
+➡️ O **dashboard com os dados em tempo real** fica em
+**http://127.0.0.1:1880/ui** (URL diferente do editor — abra numa segunda
+aba). É aqui que aparecem o chart de BPM, o gauge de temperatura e o
+indicador de alerta. O editor só mostra o fluxo e o painel de debug.
 
 Detalhes em [`node-red/README.md`](node-red/README.md).
 

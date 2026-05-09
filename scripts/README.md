@@ -4,16 +4,43 @@ Gera telemetria fake e publica no broker HiveMQ Cloud nos mesmos tópicos
 do firmware real. Use para validar Node-RED + Grafana antes/independente
 do código da Parte 1.
 
-## Setup
+## Setup (primeira vez)
 
 ```powershell
 # A partir da pasta scripts/
+
+# 1) cria virtualenv local
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1     # Windows PowerShell
+
+# 2) ativa o venv (Windows PowerShell)
+.\.venv\Scripts\Activate.ps1
+# Se aparecer erro "a execução de scripts foi desabilitada", rode antes:
+#   Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+# Para CMD (em vez de PowerShell):
+#   .\.venv\Scripts\activate.bat
+# Para Linux/macOS:
+#   source .venv/bin/activate
+
+# 3) instala paho-mqtt + python-dotenv
 pip install -r requirements.txt
 
-cp .env.example .env             # editar com creds do HiveMQ
+# 4) copia o template de credenciais e edita
+Copy-Item .env.example .env
+notepad .env
 ```
+
+Com o venv ativo, o prompt mostra `(.venv)` no começo.
+
+## Sessões futuras
+
+```powershell
+cd scripts
+.\.venv\Scripts\Activate.ps1   # só reativa, sem reinstalar
+python mock_publisher.py --scenario normal --duration 30
+```
+
+Se ver `ModuleNotFoundError: No module named 'paho'`, é sinal de que o
+venv não está ativo (ou você nunca fez `pip install`).
 
 ## Cenários
 
