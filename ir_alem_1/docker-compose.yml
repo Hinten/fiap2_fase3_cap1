@@ -1,0 +1,55 @@
+services:
+
+  # ── 1. Servidor REST simulado ──────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      SCENARIO: ${SCENARIO}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  # ── 2. Monitor de sinais vitais ───────────────────────────
+  monitor:
+    build:
+      context: .
+      dockerfile: monitor/Dockerfile
+    container_name: vitals_monitor
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      # Aponta para o serviço "api" dentro da rede Docker
+      API_BASE_URL: http://api:8000
+
+      # E-mail (vindos do .env)
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      EMAIL_SENDER: ${EMAIL_SENDER}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      EMAIL_RECIPIENT: ${EMAIL_RECIPIENT}
+
+      # Monitor
+      PATIENT_ID: ${PATIENT_ID}
+      CHECK_INTERVAL_SECONDS: ${CHECK_INTERVAL_SECONDS}
+
+      # Limiares clínicos
+      HEART_RATE_MAX: ${HEART_RATE_MAX}
+      HEART_RATE_MIN: ${HEART_RATE_MIN}
+      TEMP_MAX: ${TEMP_MAX}
+      TEMP_MIN: ${TEMP_MIN}
+      SPO2_MIN: ${SPO2_MIN}
+      SYSTOLIC_BP_MAX: ${SYSTOLIC_BP_MAX}
+      SYSTOLIC_BP_MIN: ${SYSTOLIC_BP_MIN}
+      NO_MOVEMENT_MAX_SECONDS: ${NO_MOVEMENT_MAX_SECONDS}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped

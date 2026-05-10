@@ -22,3 +22,46 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+
+# pytest cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# VSCode settings
+.vscode/
+*.code-workspace
+
+# Logs
+logs/
+*.log
+
+# Environment files
+*.env
+*.ini
+
+# Byte-compiled
+*.py[cod]
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Jupyter artifacts
+.ipynb_checkpoints/
+*.pkl
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# Data files (opcional, caso tenha arquivos grandes)
+sample_data/*.txt
+datasets/
