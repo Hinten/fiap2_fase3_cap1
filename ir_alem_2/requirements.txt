@@ -1,0 +1,10 @@
+tensorflow>=2.12
+numpy>=1.23
+pandas>=1.5
+scipy>=1.10
+scikit-learn>=1.2
+matplotlib>=3.6
+seaborn>=0.12
+wfdb>=4.1
+neurokit2>=0.2.7
+jupyterlab>=4.0
