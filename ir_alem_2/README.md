@@ -106,6 +106,9 @@ A pergunta real não é "qual é melhor?", mas **"qual é apropriada para o subs
 - Davies, M. et al. (2018). *Loihi: a neuromorphic manycore processor with on-chip learning*. IEEE Micro.
 - Yan, Z. et al. (2024). *Energy-efficient SNNs for ECG classification on neuromorphic hardware*. Frontiers in Neuroscience.
 
+## video
+url: https://drive.google.com/file/d/1iOzqClnWFcnLlP6x7qsbWhA-Blt8e9dL/view?usp=sharing
+
 ## Licença
 
 MIT — uso acadêmico do projeto CardioIA / FIAP.
