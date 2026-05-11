@@ -1,13 +1,10 @@
 // =============================================================================
-// main.cpp — STUB DA PARTE 2 (descartável)
+// main.cpp — Parte 1: Leitura de sensores + buffer offline (Edge Computing)
 // =============================================================================
-// Este arquivo existe para que a Parte 2 possa testar a stack
-// ESP32 → HiveMQ → Node-RED → Grafana sem depender da Parte 1.
-//
-// Ele lê o DHT22, conta cliques no botão (BPM cru), e chama
-// enviarParaNuvem() periodicamente. A Parte 1 vai SUBSTITUIR este arquivo
-// pelo código real (com buffer offline + simulação de Wi-Fi), mantendo
-// as chamadas a cloudBegin() / cloudLoop() / enviarParaNuvem().
+// Esta implementação lê DHT22 (temperatura/umidade) e botão (BPM simulado),
+// armazena leituras em buffer circular na RAM para resiliência offline.
+// Usa cloud_link.h para transmissão MQTT quando conectado (Parte 2).
+// Estratégia de armazenamento: buffer circular com máximo de 100 amostras.
 // =============================================================================
 
 #include <Arduino.h>
@@ -30,60 +27,114 @@ static int s_lastButtonState = HIGH;
 static const unsigned long PUBLISH_INTERVAL_MS = 5000;
 static unsigned long s_lastPublishMs = 0;
 
+// --- estrutura de leitura ---------------------------------------------------
+struct Reading {
+    uint32_t ts;        // segundos desde boot
+    float    temp;      // °C — DHT22
+    float    hum;       // %  — DHT22
+    int      bpm;       // batidas/min calculadas a partir do botão
+    bool     buffered;  // true se recuperada do buffer offline
+};
+
+// --- buffer circular para resiliência offline -------------------------------
+const int MAX_BUFFER = 100;
+Reading buffer[MAX_BUFFER];
+int bufferHead = 0;
+int bufferTail = 0;
+int bufferSize = 0;
+
+// --- funções do buffer -----------------------------------------------------
+void pushBuffer(Reading r) {
+    buffer[bufferHead] = r;
+    bufferHead = (bufferHead + 1) % MAX_BUFFER;
+    if (bufferSize < MAX_BUFFER) {
+        bufferSize++;
+    } else {
+        // sobrescreve o mais antigo
+        bufferTail = (bufferTail + 1) % MAX_BUFFER;
+    }
+}
+
+Reading popBuffer() {
+    if (bufferSize > 0) {
+        Reading r = buffer[bufferTail];
+        bufferTail = (bufferTail + 1) % MAX_BUFFER;
+        bufferSize--;
+        return r;
+    }
+    // não deveria acontecer
+    Reading empty = {0, 0.0, 0.0, 0, false};
+    return empty;
+}
+
 void setup() {
-  Serial.begin(115200);
-  delay(200);
-  Serial.println("\n[main] CardioIA stub — Parte 2");
+    Serial.begin(115200);
+    delay(200);
+    Serial.println("\n[main] CardioIA Parte 1 — Edge Computing + MQTT Parte 2");
 
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-  dht.begin();
+    pinMode(BUTTON_PIN, INPUT_PULLUP);
+    dht.begin();
 
-  if (!cloudBegin(WIFI_SSID, WIFI_PASSWORD)) {
-    Serial.println("[main] cloudBegin falhou — seguindo offline e tentando reconectar no loop");
-  }
+    if (!cloudBegin(WIFI_SSID, WIFI_PASSWORD)) {
+        Serial.println("[main] cloudBegin falhou — seguindo offline");
+    }
 }
 
-// Polling simples do botão: cada transição HIGH→LOW conta como 1 batida.
-// Funciona bem no Wokwi sem debounce sofisticado.
 static void sampleButton() {
-  int s = digitalRead(BUTTON_PIN);
-  if (s == LOW && s_lastButtonState == HIGH) {
-    s_beatCount++;
-  }
-  s_lastButtonState = s;
+    int s = digitalRead(BUTTON_PIN);
+    if (s == LOW && s_lastButtonState == HIGH) {
+        s_beatCount++;
+    }
+    s_lastButtonState = s;
 }
 
-// BPM = batidas na janela × (60 / janela_em_segundos).
-// Janela = PUBLISH_INTERVAL_MS, então fator = 60000 / janela.
 static int computeBpm(uint32_t beatsInWindow) {
-  return (int)((beatsInWindow * 60000UL) / PUBLISH_INTERVAL_MS);
+    return (int)((beatsInWindow * 60000UL) / PUBLISH_INTERVAL_MS);
 }
 
 void loop() {
-  cloudLoop();
-  sampleButton();
+    cloudLoop();  // Mantém MQTT vivo
+    sampleButton();
 
-  unsigned long now = millis();
-  if (now - s_lastPublishMs < PUBLISH_INTERVAL_MS) return;
-  s_lastPublishMs = now;
+    unsigned long now = millis();
+    if (now - s_lastPublishMs < PUBLISH_INTERVAL_MS) return;
+    s_lastPublishMs = now;
 
-  uint32_t beats = s_beatCount;
-  s_beatCount = 0;
+    uint32_t beats = s_beatCount;
+    s_beatCount = 0;
 
-  Reading r;
-  r.ts       = now / 1000;            // sem RTC — usa segundos desde boot
-  r.temp     = dht.readTemperature();
-  r.hum      = dht.readHumidity();
-  r.bpm      = computeBpm(beats);
-  r.buffered = false;
+    Reading r;
+    r.ts       = now / 1000;
+    r.temp     = dht.readTemperature();
+    r.hum      = dht.readHumidity();
+    r.bpm      = computeBpm(beats);
+    r.buffered = false;
 
-  // DHT22 às vezes retorna NaN nas primeiras leituras — descarta.
-  if (isnan(r.temp) || isnan(r.hum)) {
-    Serial.println("[main] DHT NaN, pulando publicação");
-    return;
-  }
+    if (isnan(r.temp) || isnan(r.hum)) {
+        Serial.println("[main] DHT NaN, pulando leitura");
+        return;
+    }
 
-  bool ok = enviarParaNuvem(r);
-  Serial.printf("[main] ts=%lu temp=%.1f hum=%.1f bpm=%d publish=%s\n",
-                (unsigned long)r.ts, r.temp, r.hum, r.bpm, ok ? "OK" : "FAIL");
+    Serial.printf("[main] ts=%lu temp=%.1f hum=%.1f bpm=%d connected=%s buffer_size=%d\n",
+                 (unsigned long)r.ts, r.temp, r.hum, r.bpm, cloudIsConnected() ? "YES" : "NO", bufferSize);
+
+    if (cloudIsConnected()) {
+        // Tenta enviar leitura atual
+        if (!enviarParaNuvem(r)) {
+            pushBuffer(r);  // Falhou, bufferiza
+        }
+        // Sincroniza buffer offline
+        while (bufferSize > 0 && cloudIsConnected()) {
+            Reading b = popBuffer();
+            b.buffered = true;
+            if (!enviarParaNuvem(b)) {
+                pushBuffer(b);  // Falhou novamente, re-bufferiza
+                break;
+            }
+        }
+    } else {
+        // Offline: bufferiza tudo
+        pushBuffer(r);
+        Serial.println("[main] Leitura armazenada no buffer offline");
+    }
 }
