@@ -19,9 +19,9 @@
 
 ## 👩‍🏫 Professores:
 ### Tutor(a)
-- <a href="#">Nome do Tutor</a>
+- <a href="#">Caique Nonato da Silva Bezerra</a>
 ### Coordenador(a)
-- <a href="#">Nome do Coordenador</a>
+- <a href="#">André Godoi Chiovato</a>
 
 ## 📜 Descrição
 
@@ -41,7 +41,7 @@ Duas extensões opcionais ("Ir Além") foram implementadas: um cliente Python qu
 - <b>ir_alem_1/</b> — Extensão bônus: servidor Flask com cliente REST e automação de alertas por e-mail.
 - <b>ir_alem_2/</b> — Extensão bônus: notebook Jupyter com análise de ECG e comparação entre regressão logística e rede neuromórfica (LIF).
 - <b>docs/</b> — Relatórios técnicos da atividade: `parte1_relatorio.md` (Edge Computing) e `parte2_relatorio.md` (MQTT + Dashboard).
-- <b>assets/</b> — Imagens e capturas de tela (circuito Wokwi, dashboard Grafana).
+- <b>assets/</b> — Imagens e capturas de tela (circuito Wokwi, dashboards Node-RED nos três cenários, dashboard Grafana, diagrama do flow).
 - <b>README.md</b> — Este arquivo.
 
 ## 📄 Relatórios entregáveis
@@ -55,6 +55,14 @@ Duas extensões opcionais ("Ir Além") foram implementadas: um cliente Python qu
 
 ### Circuito no Wokwi (ESP32 + DHT22 + Botão)
 ![Circuito Wokwi — CardioIA](assets/wokwi_monitor_cardiaco.png)
+
+### Dashboard Node-RED — três cenários de validação
+
+| Operação normal | Alerta de taquicardia (BPM > 120) | Alerta de febre (temp > 38 °C) |
+|-----------------|------------------------------------|--------------------------------|
+| ![Normal](assets/node_red_normal.png) | ![Taquicardia](assets/node_red_taquicardia.png) | ![Febre](assets/node_red_febre.png) |
+
+Reproduzir cada cena com o mock publisher (`scripts/mock_publisher.py --scenario {normal,taquicardia,febre}`).
 
 ### Dashboard Grafana Cloud (bônus)
 [![Dashboard Grafana — CardioIA](assets/grafana_dashboard.png)](https://hinten.grafana.net/public-dashboards/1fc63ea0bb144546ac549fc34fb3b542)

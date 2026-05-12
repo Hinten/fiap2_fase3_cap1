@@ -130,6 +130,8 @@ O flow (`node-red/flows.json`) tem três blocos principais:
    o que é essencial para tolerar mensagens corrompidas vindas do
    ESP32 ou do mock publisher de testes.
 
+![Topologia do flow Node-RED — ingestão MQTT, parser, três saídas paralelas (chart, gauge, alerta) e ramo opcional InfluxDB](../assets/diagrama_node_red.png)
+
 Os limites são parametrizados via **context global** do Node-RED
 (`global.BPM_MAX`, `global.TEMP_MAX`), permitindo ajuste sem redeploy.
 
@@ -188,10 +190,21 @@ mais crítico em cardiologia.
 | Taquicardia | `python scripts/mock_publisher.py --scenario taquicardia --duration 15` | Alerta vermelho ao cruzar 120 bpm |
 | Febre | `python scripts/mock_publisher.py --scenario febre --duration 15` | Gauge vermelho ao cruzar 38 °C |
 
-> Os prints de cada cenário (`assets/node_red_normal.png`,
-> `assets/node_red_taquicardia.png`, `assets/node_red_febre.png`) devem
-> ser capturados e adicionados ao repositório após execução local. Ver
-> [`docs/pendencias.md`](pendencias.md) — **item de prioridade máxima**.
+**Print 1 — Operação normal** (`scenario normal`): gauge verde, gráfico
+estável entre 60–90 bpm, indicador "✅ Sinais vitais OK".
+
+![Dashboard Node-RED em operação normal](../assets/node_red_normal.png)
+
+**Print 2 — Alerta de taquicardia** (`scenario taquicardia`): BPM
+ultrapassa 120 e o indicador muda para fundo vermelho com a mensagem
+"🚨 ALERTA: BPM > 120 | TAQUICARDIA".
+
+![Dashboard Node-RED com alerta de taquicardia](../assets/node_red_taquicardia.png)
+
+**Print 3 — Alerta de febre** (`scenario febre`): o gauge entra na zona
+vermelha (> 38 °C) e o indicador exibe "🚨 ALERTA: TEMP > 38 | FEBRE".
+
+![Dashboard Node-RED com alerta de febre](../assets/node_red_febre.png)
 
 ---
 
