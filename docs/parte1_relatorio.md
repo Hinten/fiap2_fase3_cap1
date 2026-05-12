@@ -423,6 +423,8 @@ RAM:   [=         ]  14.6% (47 KB / 327 KB)
 
 ## 8. Entregáveis
 
+**Link Wokwi:** [Projeto CardioIA no Wokwi](https://wokwi.com/projects/463837603097937921)
+
 ✅ **Código:**
 - `firmware/src/main.cpp` — Implementação Parte 1 (280 linhas, comentadas em português)
 - `firmware/include/cloud_link.h` — Interface pública (40 linhas, fornecida)
@@ -432,8 +434,6 @@ RAM:   [=         ]  14.6% (47 KB / 327 KB)
 ✅ **Documentação:**
 - `firmware/README.md` — Guia técnico completo (setup, testes, troubleshooting)
 - `docs/parte1_relatorio.md` — **Este relatório** (implementação detalhada)
-- `AGENTS.md` — Arquitetura geral e padrões
-- `CLAUDE.md` — Direcionamento para agentes IA
 
 ✅ **Assets:**
 - `assets/wokwi_monitor_cardiaco.png` — Circuito Wokwi (referência visual)

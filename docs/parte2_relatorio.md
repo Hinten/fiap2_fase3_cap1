@@ -155,6 +155,44 @@ O flow inclui dois recursos para validação rápida:
   febre, tudo, offline-flush, ruido). Permite validar a stack inteira
   HiveMQ → Node-RED → Grafana **sem precisar do firmware da Parte 1**.
 
+### 3.4 Layout e comportamento do dashboard
+
+O dashboard acessível em `http://127.0.0.1:1880/ui` é composto por três
+widgets dispostos verticalmente:
+
+1. **Gráfico de BPM** (`ui_chart`) — linha temporal com janela deslizante
+   de 5 minutos, eixo vertical de 40 a 180 bpm. Cada mensagem MQTT
+   acrescenta um ponto; o gráfico rola automaticamente à medida que chegam
+   novas leituras.
+
+2. **Gauge de temperatura** (`ui_gauge`) — dial semicircular de 30 a 42 °C,
+   com três zonas de cor: verde (< 37,5 °C), amarelo (37,5–38 °C) e
+   vermelho (> 38 °C). O ponteiro atualiza a cada mensagem recebida.
+
+3. **Indicador de alerta** (`ui_text`) — exibe fundo **verde** com o texto
+   "✅ Sinais vitais OK" em operação normal. Quando `bpm > 120` ou
+   `temp > 38`, o fundo muda para **vermelho** e o texto detalha o
+   parâmetro e o valor que ultrapassou o limiar
+   (ex.: "🚨 ALERTA: BPM 127 > 120 | TAQUICARDIA").
+
+**Comportamento durante alertas combinados:** se ambos os limiares forem
+cruzados simultaneamente (cenário `tudo`), o indicador exibe os dois
+alertas concatenados na mesma mensagem, priorizando BPM por ser o critério
+mais crítico em cardiologia.
+
+**Reprodução dos cenários de teste** (com o mock publisher):
+
+| Cenário | Comando | Resultado esperado no `/ui` |
+|---------|---------|----------------------------|
+| Normal | `python scripts/mock_publisher.py --scenario normal --duration 30` | Gauge verde, gráfico estável entre 60–90 bpm |
+| Taquicardia | `python scripts/mock_publisher.py --scenario taquicardia --duration 15` | Alerta vermelho ao cruzar 120 bpm |
+| Febre | `python scripts/mock_publisher.py --scenario febre --duration 15` | Gauge vermelho ao cruzar 38 °C |
+
+> Os prints de cada cenário (`assets/node_red_normal.png`,
+> `assets/node_red_taquicardia.png`, `assets/node_red_febre.png`) devem
+> ser capturados e adicionados ao repositório após execução local. Ver
+> [`docs/pendencias.md`](pendencias.md) — **item de prioridade máxima**.
+
 ---
 
 ## 4. Bônus — Grafana Cloud
