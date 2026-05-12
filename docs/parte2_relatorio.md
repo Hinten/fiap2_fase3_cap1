@@ -1,7 +1,6 @@
 # CardioIA — Fase 3, Cap. 1 / Parte 2
 ## Transmissão MQTT e Visualização em Dashboards
 
-**Aluno:** Lucas Francelino
 **Data:** 09/05/2026
 
 ---
