@@ -155,6 +155,19 @@ O flow inclui dois recursos para validação rápida:
   febre, tudo, offline-flush, ruido). Permite validar a stack inteira
   HiveMQ → Node-RED → Grafana **sem precisar do firmware da Parte 1**.
 
+### 3.4 Capturas de tela do dashboard
+
+> **Pendência:** Inserir aqui os prints do dashboard em `http://127.0.0.1:1880/ui`
+> após executar o mock publisher com os cenários abaixo.
+
+| Cenário | Comando | Print |
+|---------|---------|-------|
+| Operação normal | `python scripts/mock_publisher.py --scenario normal --duration 30` | `assets/node_red_normal.png` |
+| Alerta taquicardia | `python scripts/mock_publisher.py --scenario taquicardia --duration 15` | `assets/node_red_taquicardia.png` |
+| Alerta febre | `python scripts/mock_publisher.py --scenario febre --duration 15` | `assets/node_red_febre.png` |
+
+![Dashboard Node-RED — operação normal](../assets/node_red_normal.png)
+
 ---
 
 ## 4. Bônus — Grafana Cloud

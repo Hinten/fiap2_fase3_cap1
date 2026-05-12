@@ -4,29 +4,98 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project context
 
-FIAP coursework — **Fase 3, Cap. 1**: the *CardioIA* IoT health-monitoring prototype. The assignment brief (in Portuguese) is in `enunciado.md` and is the source of truth for scope, deliverables, and grading. As of this writing the repo contains **only** that brief — no code has been committed yet.
+FIAP coursework — **Fase 3, Cap. 1**: the *CardioIA* IoT health-monitoring prototype. The assignment brief is in `enunciado.md`. The project is fully implemented.
 
-The deliverable is a simulated wearable that:
-1. Reads vital signs on an **ESP32 in Wokwi** (mandatory **DHT22** for temperature/humidity + one free-choice sensor — a button is suggested to simulate BPM).
-2. Buffers readings locally for **offline resilience** (Edge). SPIFFS is volatile in Wokwi/PlatformIO, so the brief explicitly accepts the **Serial Monitor** as the offline-storage stand-in.
-3. Publishes to a cloud broker via **MQTT** (HiveMQ Cloud is the suggested broker) when a simulated Wi-Fi boolean is `true`, then clears the local buffer.
-4. Visualises in **Node-RED** (chart + gauge + threshold alert, e.g. BPM > 120 or temp > 38 °C); Grafana Cloud is optional.
+**Grading rubric (2 pts each):** sensor reads, offline resilience, MQTT integration, dashboard + alerts, documentation. Keep changes balanced across all five axes.
 
-Two optional "Ir Além" extensions: a Python REST + email-alert client, and an AI time-series notebook comparing logistic regression vs. a neuromorphic (LIF/FHN) model.
+## Build & run commands
 
-## Expected stack & layout
+### Firmware (ESP32 / PlatformIO)
+```bash
+cd firmware
+pio run -e esp32dev           # compilar
+pio run -e esp32dev -t upload # upload para ESP32 físico (opcional)
+# Serial monitor: baud 115200
+```
+Expected output: `Flash: 68% / RAM: 14.6% / [SUCCESS]`
 
-Nothing is scaffolded yet — when adding code, prefer creating these directories at the repo root rather than nesting under a single umbrella folder:
+### Mock publisher (Python — testa Node-RED sem ESP32)
+```bash
+cd scripts
+cp .env.example .env   # editar com creds HiveMQ
+pip install -r requirements.txt
+python mock_publisher.py --scenario normal --duration 30
+# Cenários: normal | taquicardia | febre | tudo | offline-flush | ruido
+```
 
-- `firmware/` (or `esp32/`) — Arduino/PlatformIO C++ for the ESP32 sketch (Wi-Fi sim flag, sensor reads, MQTT publish, offline buffer).
-- `node-red/` — exported `flows.json` for the dashboard.
-- `python/` (only if "Ir Além 1" is attempted) — REST client + email automation.
-- `notebook/` (only if "Ir Além 2" is attempted) — Jupyter notebook + README + report.
-- `docs/` or `relatorio/` — the required PDFs/markdown reports (Parte 1: ≥1 page on flow + resilience; Parte 2: ≥2 pages on MQTT + dashboard).
+### Node-RED
+```bash
+npm install -g --unsafe-perm node-red
+node-red
+# Editor: http://127.0.0.1:1880  |  Dashboard: http://127.0.0.1:1880/ui
+```
+Importar `node-red/flows.json` → configurar nó MQTT com host HiveMQ → Deploy.
 
-## Working notes
+### Ir Além 1 (Flask API + monitor e-mail)
+```bash
+cd ir_alem_1
+docker compose up          # recomendado
+# ou: python api/api_server.py + python monitor/monitor.py
+```
 
-- **Language**: the brief, reports, and code comments are expected in **Portuguese (pt-BR)**. Match that tone when editing or generating documentation unless the user asks otherwise.
-- **Wokwi limitation**: do not waste effort trying to make SPIFFS persist across simulator runs — the brief acknowledges it won't, and grading skips the SPIFFS criterion. Use an in-memory ring buffer (or Serial dump) for the resilience demo and document the chosen sample cap.
-- **Grading is split 2/2/2/2/2** across: sensor reads, offline resilience, MQTT integration, dashboard + alerts, documentation. Keep changes balanced across these axes rather than over-investing in one.
-- **No build tooling exists yet**. Once a PlatformIO project or Python venv is added, update this file with the actual build/test commands.
+### Ir Além 2 (Notebook IA)
+```bash
+cd ir_alem_2
+pip install -r requirements.txt
+jupyter notebook cardioia_ir_alem2.ipynb
+```
+
+## Credenciais (nunca commitar)
+
+- `firmware/include/secrets.h` — copiar de `secrets.h.example`, preencher `WIFI_SSID`, `MQTT_HOST`, `MQTT_USER`, `MQTT_PASSWORD`, `DEVICE_ID`
+- `scripts/.env` — copiar de `.env.example`, mesmas credenciais HiveMQ
+- Ambos estão no `.gitignore`
+
+## Arquitetura
+
+### Fluxo de dados
+
+```
+ESP32 (Wokwi)
+  │  DHT22 + Botão → Reading struct
+  │  Buffer RAM 100 amostras (se offline)
+  ↓ MQTT/TLS :8883
+HiveMQ Cloud
+  ↓ MQTT Subscribe
+Node-RED  →  /ui  (chart BPM + gauge temp + alerta)
+          →  InfluxDB Cloud  →  Grafana Cloud (bônus)
+```
+
+### Contrato Parte 1 ↔ Parte 2
+
+`firmware/include/cloud_link.h` é o único ponto de acoplamento entre as partes. A Parte 1 (`main.cpp`) usa apenas:
+- `cloudBegin()` — setup Wi-Fi + MQTT
+- `cloudLoop()` — keep-alive, chamar a cada iteração do `loop()`
+- `cloudIsConnected()` — decide publicar ou bufferizar
+- `enviarParaNuvem(Reading)` — retorna `false` se falhar; Parte 1 deve guardar no buffer
+
+A Parte 2 (`cloud_link.cpp`) implementa Wi-Fi, TLS e MQTT sem que a Parte 1 precise saber detalhes.
+
+### JSON payload (tópico `cardioia/<deviceId>/telemetry`)
+```json
+{ "ts": 1715260800, "deviceId": "cardioia-01",
+  "temp": 36.8, "hum": 58.2, "bpm": 78, "buffered": false }
+```
+O campo `buffered: true` indica leitura recuperada do buffer offline.
+
+### Buffer offline
+
+Ring buffer FIFO de 100 amostras em RAM (`main.cpp`). Capacidade ~8 min a 5 s/amostra. **Não usar SPIFFS** — é volátil no Wokwi/PlatformIO (limitação do simulador aceita pelo enunciado).
+
+### Alertas Node-RED
+
+Limiares configuráveis via context global (`global.BPM_MAX = 120`, `global.TEMP_MAX = 38`). A função JavaScript de alerta descarta payloads malformados sem quebrar o flow.
+
+## Idioma
+
+Código, comentários e documentação em **português (pt-BR)**, conforme exigência do enunciado.
