@@ -423,7 +423,7 @@ RAM:   [=         ]  14.6% (47 KB / 327 KB)
 
 ## 8. Entregáveis
 
-**Link Wokwi:** [Projeto CardioIA no Wokwi](https://wokwi.com/projects/XXXXXXXXXX) *(substituir pelo link do projeto público)*
+**Link Wokwi:** [Projeto CardioIA no Wokwi](https://wokwi.com/projects/463837603097937921)
 
 ✅ **Código:**
 - `firmware/src/main.cpp` — Implementação Parte 1 (280 linhas, comentadas em português)

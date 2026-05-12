@@ -5,71 +5,65 @@
 
 ---
 
-## 1. Link público do projeto Wokwi
+## ⚠️ PRIORIDADE MÁXIMA — Screenshots do dashboard Node-RED
 
-**Impacto:** Entregável obrigatório da Parte 1 — pode custar pontos na rubrica de sensores.
+> **OBRIGATÓRIO para os 2 pontos da rubrica "Dashboard funcional e alertas automáticos".**  
+> O enunciado exige explicitamente: *"Prints evidenciando a aplicação ou export do dashboard no Node-RED"*.  
+> **Sem esses prints o projeto pode perder 2 pontos inteiros (de 10).**
 
-**O que fazer:**
-1. Acesse https://wokwi.com → New Project → ESP32
-2. Cole os arquivos do `firmware/` no editor Wokwi:
-   - `firmware/src/main.cpp`
-   - `firmware/src/cloud_link.cpp`
-   - `firmware/include/cloud_link.h`
-   - `firmware/include/secrets.h` (com credenciais reais)
-   - `firmware/platformio.ini`
-3. Adicione os componentes no `diagram.json`:
-   - DHT22 no pino GPIO 4
-   - Botão no pino GPIO 5 (INPUT_PULLUP)
-4. Pressione **Play ▶️** e confirme que o Serial Monitor exibe leituras
-5. Clique em **Share** → copie o link público
+### O que precisa ser entregue
 
-**Onde atualizar:**
-- `README.md` — seção "Como executar", passo 1
-- `docs/parte1_relatorio.md` — seção 8 (Entregáveis)
+Três capturas de tela do dashboard em `http://127.0.0.1:1880/ui`, salvas como:
 
-Substituir o placeholder `https://wokwi.com/projects/XXXXXXXXXX` pelo link real.
+| Print | Arquivo esperado |
+|-------|-----------------|
+| Dashboard em operação normal | `assets/node_red_normal.png` |
+| Dashboard com alerta de taquicardia (BPM > 120) | `assets/node_red_taquicardia.png` |
+| Dashboard com alerta de febre (temp > 38 °C) | `assets/node_red_febre.png` |
 
----
+### Passo a passo
 
-## 2. Screenshots do dashboard Node-RED
-
-**Impacto:** Entregável obrigatório da Parte 2 — o enunciado exige "prints evidenciando a aplicação".
-
-**O que fazer:**
-
-### Pré-requisitos
+**Terminal 1 — subir o Node-RED:**
 ```powershell
-# Terminal 1 — Node-RED
 npm install -g --unsafe-perm node-red
 node-red
-
-# Importar flows.json no editor http://127.0.0.1:1880
-# Instalar node-red-dashboard via Manage Palette
-# Configurar nó MQTT com host/creds HiveMQ → Deploy
 ```
+1. Acessar `http://127.0.0.1:1880`
+2. Instalar `node-red-dashboard` em **Manage Palette → Install**
+3. Importar `node-red/flows.json`
+4. Configurar o nó MQTT com host e credenciais HiveMQ → **Deploy**
 
+**Terminal 2 — gerar dados e capturar:**
 ```powershell
-# Terminal 2 — Mock publisher
 cd scripts
-copy .env.example .env   # preencher com creds HiveMQ
+copy .env.example .env   # preencher com credenciais HiveMQ
 pip install -r requirements.txt
+
+# Print 1: operação normal
+python mock_publisher.py --scenario normal --duration 30
+# → abrir http://127.0.0.1:1880/ui → tirar print → salvar como assets/node_red_normal.png
+
+# Print 2: alerta de taquicardia
+python mock_publisher.py --scenario taquicardia --duration 15
+# → abrir http://127.0.0.1:1880/ui → tirar print com alerta vermelho → salvar como assets/node_red_taquicardia.png
+
+# Print 3: alerta de febre
+python mock_publisher.py --scenario febre --duration 15
+# → abrir http://127.0.0.1:1880/ui → tirar print com gauge vermelho → salvar como assets/node_red_febre.png
 ```
 
-### Capturas necessárias
-
-| Print | Comando | Salvar como |
-|-------|---------|-------------|
-| Operação normal (chart + gauge verdes) | `python mock_publisher.py --scenario normal --duration 30` | `assets/node_red_normal.png` |
-| Alerta taquicardia (BPM > 120) | `python mock_publisher.py --scenario taquicardia --duration 15` | `assets/node_red_taquicardia.png` |
-| Alerta febre (temp > 38 °C) | `python mock_publisher.py --scenario febre --duration 15` | `assets/node_red_febre.png` |
-
-Abrir `http://127.0.0.1:1880/ui` após cada comando e tirar print mostrando o chart de BPM, o gauge de temperatura e o indicador de alerta.
-
-As referências já estão inseridas em `docs/parte2_relatorio.md` (seção 3.4).
+**Após salvar os arquivos em `assets/`**, os prints já estão referenciados automaticamente em `docs/parte2_relatorio.md` (seção 3.4). Commitar e fazer push para o PR.
 
 ---
 
-## 3. Nomes dos professores no README
+## 1. ~~Link público do projeto Wokwi~~ ✅ CONCLUÍDO
+
+Link atualizado: https://wokwi.com/projects/463837603097937921  
+Já aplicado em `README.md` e `docs/parte1_relatorio.md`.
+
+---
+
+## 2. Nomes dos professores no README
 
 **Impacto:** Apresentação do projeto.
 
@@ -84,7 +78,7 @@ pelos nomes reais com os respectivos links do LinkedIn.
 
 ---
 
-## 4. (Opcional) LinkedIn dos integrantes no README
+## 3. (Opcional) LinkedIn dos integrantes no README
 
 No `README.md`, substituir os `href="#"` pelos perfis LinkedIn de cada integrante:
 - Alice C. M. Assis — RM 566233
@@ -95,13 +89,10 @@ No `README.md`, substituir os `href="#"` pelos perfis LinkedIn de cada integrant
 
 ---
 
-## 5. (Opcional) Vídeo YouTube para Ir Além 2
-
-**Impacto:** Critério de avaliação do bônus "Ir Além 2".
+## 4. (Opcional) Vídeo YouTube para Ir Além 2
 
 O enunciado exige um vídeo de até 4 minutos, postado no YouTube como **"não listado"**, apresentando os resultados do notebook.
 
-**O que fazer:**
 1. Gravar apresentação do `ir_alem_2/cardiaia_ir_alem2.ipynb` (~4 min):
    - Mostrar os dados do MIT-BIH carregados
    - Comparar métricas LR × LIF (accuracy, F1)
@@ -113,10 +104,10 @@ O enunciado exige um vídeo de até 4 minutos, postado no YouTube como **"não l
 
 ## Resumo de prioridade
 
-| # | Pendência | Obrigatório? | Esforço |
-|---|-----------|:---:|---------|
-| 1 | Link Wokwi | ✅ Sim | ~10 min |
-| 2 | Screenshots Node-RED | ✅ Sim | ~20 min |
-| 3 | Nomes dos professores | — Apresentação | ~2 min |
-| 4 | LinkedIn dos integrantes | — Apresentação | ~5 min |
-| 5 | Vídeo YouTube Ir Além 2 | — Bônus | ~30 min |
+| # | Pendência | Impacto | Esforço |
+|---|-----------|---------|---------|
+| ⚠️ | **Screenshots Node-RED** | **−2 pts se faltar** | ~20 min |
+| ~~1~~ | ~~Link Wokwi~~ | ~~Obrigatório~~ | ✅ Feito |
+| 2 | Nomes dos professores | Apresentação | ~2 min |
+| 3 | LinkedIn dos integrantes | Apresentação | ~5 min |
+| 4 | Vídeo YouTube Ir Além 2 | Bônus | ~30 min |

@@ -44,6 +44,21 @@ Duas extensões opcionais ("Ir Além") foram implementadas: um cliente Python qu
 - <b>assets/</b> — Imagens e capturas de tela (circuito Wokwi, dashboard Grafana).
 - <b>README.md</b> — Este arquivo.
 
+## 📄 Relatórios entregáveis
+
+| Relatório | Parte | Conteúdo |
+|-----------|-------|---------|
+| [Parte 1 — Edge Computing](docs/parte1_relatorio.md) | Obrigatório | Fluxo de funcionamento, sensores, buffer offline e lógica de resiliência |
+| [Parte 2 — MQTT e Dashboard](docs/parte2_relatorio.md) | Obrigatório | Fluxo de comunicação MQTT, configuração do Node-RED e alertas |
+
+## 📸 Demonstração
+
+### Circuito no Wokwi (ESP32 + DHT22 + Botão)
+![Circuito Wokwi — CardioIA](assets/wokwi_monitor_cardiaco.png)
+
+### Dashboard Grafana Cloud (bônus)
+[![Dashboard Grafana — CardioIA](assets/grafana_dashboard.png)](https://hinten.grafana.net/public-dashboards/1fc63ea0bb144546ac549fc34fb3b542)
+
 ## 🔧 Como executar o código
 
 ### Pré-requisitos
@@ -61,7 +76,7 @@ copy include\secrets.h.example include\secrets.h
 pio run -e esp32dev
 ```
 
-Abrir o **[projeto no Wokwi](https://wokwi.com/projects/XXXXXXXXXX)** *(link a preencher)*, colar os arquivos de `firmware/` e pressionar **Play ▶️**. O Serial Monitor mostrará as leituras e o status da conexão.
+Abrir o **[projeto no Wokwi](https://wokwi.com/projects/463837603097937921)**, pressionar **Play ▶️** e acompanhar as leituras no Serial Monitor.
 
 Detalhes de setup, diagrama de circuito e troubleshooting em [`firmware/README.md`](firmware/README.md).
 
