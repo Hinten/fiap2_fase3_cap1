@@ -4,6 +4,8 @@
 gauge de temperatura, indicador de alerta e (opcional) escrita no InfluxDB
 Cloud para alimentar o Grafana.
 
+![Topologia do flow Node-RED](../assets/diagrama_node_red.png)
+
 ## Pré-requisitos
 
 ```powershell
