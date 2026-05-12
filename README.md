@@ -119,6 +119,18 @@ jupyter notebook cardioia_ir_alem2.ipynb
 
 Ver detalhes em [`ir_alem_2/README.md`](ir_alem_2/README.md).
 
+---
+
+## 📜 Vídeo
+
+## [Clique aqui](https://youtu.be/-ZB9HGTCSXg) para ver o vídeo explicando o projeto.
+
+<p align="center">
+  <img src="assets/Cap1_ IrAlem2.png" alt="O Problema - PDF complexo e desconectado" width=80%>
+</p>
+
+---
+
 ## 🗃 Histórico de lançamentos
 
 * 0.3.0 — 12/05/2026
